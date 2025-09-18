@@ -51,7 +51,8 @@ public class Iprefer {
                 long endTime = System.currentTimeMillis();
                 long duration = endTime - startTime;
                 double rateMbps = (totalBytesRead * 8.0) / (duration / 1000.0) / 1000000.0; // Convert to Mbps
-                System.out.println("received=" + totalBytesRead + " rate=" + String.format("%.2f", rateMbps) + " Mbps");
+                int KBps = totalBytesRead / 1000;
+                System.out.println("received=" + KBps + " rate=" + String.format("%.2f", rateMbps) + " Mbps");
             } catch (IOException e) {
                 System.out.println("Exception caught when trying to listen on port "
                         + server_port + " or listening for a connection");
@@ -59,6 +60,7 @@ public class Iprefer {
             }
 
         } else if (state == State.CLIENT) {
+            int totalBytesSent = 0;
             try (
                     Socket client = new Socket(hostname, server_port);
                     OutputStream out = client.getOutputStream();
@@ -69,7 +71,12 @@ public class Iprefer {
                 long endTime = startTime + timeInSeconds * 1000;
                 while (System.currentTimeMillis() < endTime) {
                     out.write(data);
+                    totalBytesSent += 1000;
                 }
+                long duration = System.currentTimeMillis() - startTime;
+                double rateMbps = (totalBytesSent * 8.0) / (duration / 1000.0) / 1000000.0; // Convert to Mbps
+                int KBps = totalBytesSent / 1000;
+                System.out.println("sent=" + KBps + " rate=" + String.format("%.2f", rateMbps) + " Mbps");
 
             } catch (IOException e) {
                 System.out.println("Exception caught when trying to connect to "
