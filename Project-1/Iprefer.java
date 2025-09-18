@@ -5,8 +5,8 @@ public class Iprefer {
         // main method body
         State state = State.UNDEFINED;
         int server_port = -1;
-        String hostname;
-        int timeInSeconds;
+        String hostname = null;
+        int timeInSeconds = 0;
         Iparser myCLIparser = new Iparser(args);
         String[] result = myCLIparser.getResults();
         if (result.length == 1) {
@@ -24,6 +24,10 @@ public class Iprefer {
             timeInSeconds = Integer.parseInt(result[3]);
 
         }
+
+        /////////////////// SOCKET PROGRAMMING////////////////////////
+        // based on whether this is a client prgram/ server program we gotta initalize
+        /////////////////// things
 
     }
 
