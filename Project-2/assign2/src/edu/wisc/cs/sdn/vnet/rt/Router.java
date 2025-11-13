@@ -148,13 +148,17 @@ public class Router extends Device
 		
 		// Step 6: Forward the packet
 		// Lookup the route entry with longest prefix match
+		System.out.println("Looking up route for destination: " + net.floodlightcontroller.packet.IPv4.fromIPv4Address(destAddr));
 		RouteEntry routeEntry = this.routeTable.lookup(destAddr);
 		
 		if (routeEntry == null)
 		{
 			System.out.println("No matching route entry, dropping");
+			System.out.println("Route table:");
+			System.out.println(this.routeTable.toString());
 			return; // Drop packet if no route matches
 		}
+		System.out.println("Found route: " + routeEntry.toString());
 		
 		// Step 7: Determine next-hop IP address
 		int nextHopIP;
