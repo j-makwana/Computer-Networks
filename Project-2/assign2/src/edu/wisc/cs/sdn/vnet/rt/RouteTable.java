@@ -49,19 +49,14 @@ public class RouteTable
 				int mask = entry.getMaskAddress();
 				int destination = entry.getDestinationAddress();
 				
-				System.out.println("DEBUG: Checking entry: dest=" + IPv4.fromIPv4Address(destination) + 
-				                   " mask=" + IPv4.fromIPv4Address(mask));
-				System.out.println("DEBUG: (ip & mask) = " + IPv4.fromIPv4Address(ip & mask));
-				System.out.println("DEBUG: (dest & mask) = " + IPv4.fromIPv4Address(destination & mask));
-				
 				// Check if this entry matches the IP address
 				// (ip & mask) == (destination & mask) means the network portions match
 				if ((ip & mask) == (destination & mask))
 				{
-					System.out.println("DEBUG: MATCH!");
 					// This entry matches - check if it has a longer prefix than current best
 					// Longer prefix = more 1 bits in mask = larger mask value
-					if (mask > longestMask)
+					// Use Integer.compareUnsigned because masks are treated as unsigned
+					if (longestMatch == null || Integer.compareUnsigned(mask, longestMask) > 0)
 					{
 						longestMatch = entry;
 						longestMask = mask;
