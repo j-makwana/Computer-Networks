@@ -98,31 +98,23 @@ public class Router extends Device
 		
 		// Step 3: Verify checksum
 		short originalChecksum = ipPacket.getChecksum();
-		
-		// Reset checksum to 0 for verification
-		ipPacket.setChecksum((short) 0);
-		
-		// Serialize to recalculate checksum
+		ipPacket.resetChecksum();
 		byte[] serialized = ipPacket.serialize();
 		
-		// Calculate checksum over IP header only
-		java.nio.ByteBuffer bb = java.nio.ByteBuffer.wrap(serialized);
-		int accumulation = 0;
-		for (int i = 0; i < ipPacket.getHeaderLength() * 2; ++i) {
-			accumulation += 0xffff & bb.getShort();
-		}
-		accumulation = ((accumulation >> 16) & 0xffff) + (accumulation & 0xffff);
-		short calculatedChecksum = (short) (~accumulation & 0xffff);
-		
-		// Restore original checksum
-		ipPacket.setChecksum(originalChecksum);
+		// Deserialize to get the recalculated checksum
+		net.floodlightcontroller.packet.IPv4 tempPacket = new net.floodlightcontroller.packet.IPv4();
+		tempPacket.deserialize(serialized, 0, serialized.length);
+		short calculatedChecksum = tempPacket.getChecksum();
 		
 		// Compare checksums
 		if (originalChecksum != calculatedChecksum)
 		{
-			System.out.println("Invalid checksum, dropping");
+			System.out.println("Invalid checksum, dropping (expected: " + calculatedChecksum + ", got: " + originalChecksum + ")");
 			return; // Drop packet with invalid checksum
 		}
+		
+		// Restore the original checksum to the packet
+		ipPacket.setChecksum(originalChecksum);
 		
 		// Step 4: Decrement TTL and check if it becomes 0
 		byte ttl = ipPacket.getTtl();
